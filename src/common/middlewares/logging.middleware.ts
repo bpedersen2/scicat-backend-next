@@ -9,13 +9,14 @@ export class AppLoggerMiddleware implements NestMiddleware {
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, path: url, baseUrl, body, params, protocol, query, rawHeaders } = request;
     const userAgent = request.get('user-agent') || '';
+    const {password, ...bodyLog} = body;
 
     response.on('close', () => {
       const { statusCode } = response;
       const contentLength = response.get('content-length');
 
       this.logger.log(
-        `${method} ${baseUrl}${url} ${JSON.stringify(params)} ${JSON.stringify(body)} ${JSON.stringify(query)} ${rawHeaders} ${protocol} ${statusCode} ${contentLength} - ${userAgent} ${ip}`
+        `${method} ${baseUrl}${url} ${JSON.stringify(params)} ${JSON.stringify(bodyLog)} ${JSON.stringify(query)} ${rawHeaders} ${protocol} ${statusCode} ${contentLength} - ${userAgent} ${ip}`
       );
     });
 
