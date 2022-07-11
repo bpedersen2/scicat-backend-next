@@ -1,4 +1,4 @@
-import { Logger, Module, OnApplicationBootstrap } from "@nestjs/common";
+import { Logger, MiddlewareConsumer, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { DatasetsModule } from "./datasets/datasets.module";
 import { AuthModule } from "./auth/auth.module";
@@ -28,6 +28,7 @@ import { join } from "path";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { formatCamelCase, unwrapJSON } from "./common/handlebars-helpers";
 import { CommonModule } from "./common/common.module";
+import { AppLoggerMiddleware } from "./common/middlewares/logging.middleware";
 
 @Module({
   imports: [
@@ -97,6 +98,11 @@ import { CommonModule } from "./common/common.module";
   ],
 })
 export class AppModule implements OnApplicationBootstrap {
+
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+  }
+
   constructor(
     private configService: ConfigService,
     private proposalsService: ProposalsService,
